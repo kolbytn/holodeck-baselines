@@ -1,10 +1,11 @@
--e git://github.com/BYU-PCCL/holodeck@463afd911972351574a265eec7a6a47ec8514a7b#egg=holodeck
+absl-py==0.9.0
+-e git://github.com/BYU-PCCL/holodeck@299e49a56fc782ccbe0d79628ba7225ea02a709b#egg=holodeck
 imageio==2.6.1
-numpy==1.17.4
-Pillow==6.2.1
+numpy==1.18.0
+Pillow==7.0.0
 pkg-resources==0.0.0
 posix-ipc==1.0.4
 psutil==5.6.7
 PyPrind==2.11.2
--e git://github.com/astooke/rlpyt@ba824f18f8598521ea4eb9f06e4f9fb129eb599a#egg=rlpyt
-torch==1.3.1
+-e git://github.com/astooke/rlpyt@d797dd8835a91a7b2902563a097c83ed7c8d3e92#egg=rlpyt
+torch==1.2.0
