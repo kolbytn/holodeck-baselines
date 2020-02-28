@@ -167,4 +167,4 @@ class HolodeckEnv(Env):
     def _make_gif(self, rollout, filename):
         with imageio.get_writer(filename, mode='I', duration=1 / 30) as writer:
             for x in rollout:
-                writer.append_data(((x[0, :, :] + 0.5) * 255).astype(np.uint8))
+                writer.append_data((x).astype(np.uint8))
