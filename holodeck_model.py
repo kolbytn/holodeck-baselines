@@ -46,7 +46,7 @@ class PpoHolodeckModel(nn.Module):
 
         self._value = nn.Linear(hidden_size, 1)
 
-        self._log_std = torch.nn.Parameter(torch.zeros(action_size))
+        self._log_std = torch.nn.Parameter(torch.ones(action_size))
 
     def forward(self, state, prev_action, prev_reward):
         img, lin = state

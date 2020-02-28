@@ -15,18 +15,18 @@ from rlpyt.samplers.collections import TrajInfo
 HolodeckObservation = namedtuple('HolodeckObservation', ['img', 'lin'])
 
 
+# TODO forest: make reward distance=1
 class HolodeckEnv(Env):
     def __init__(self, scenario_name='', scenario_cfg=None, max_steps=200, 
-                 gif_freq=500, image_dir='images/test'):
+                 gif_freq=500, image_dir='images/test', viewport=False):
 
         self._env = holodeck.make(scenario_name=scenario_name, 
                                   scenario_cfg=scenario_cfg, 
-                                  show_viewport=False)
+                                  show_viewport=viewport)  # TODO fix remote viewportfalse error
 
         # Get action space from holodeck env and store for use with rlpyt
         if self.is_action_continuous:
-            self._action_space = FloatBox(-256, 256, 
-                                          self._env.action_space.shape)  # TODO get continuous action space bounds
+            self._action_space = FloatBox(-1, 1, self._env.action_space.shape)
 
         else:
             self._action_space = IntBox(self._env.action_space._low, 
@@ -34,8 +34,8 @@ class HolodeckEnv(Env):
                                         self._env.action_space.shape)  # TODO don't access protected data members
 
         # TODO fix sphere control scheme
-        # self._env.set_control_scheme('sphere0', 1)  
-        # self._action_space = IntBox(0, 4, ())
+        self._env.set_control_scheme('sphere0', 1)  
+        self._action_space = IntBox(0, 4, ())
 
         # Calculate general observation space with all sensor data
         max_width = 0
@@ -114,7 +114,10 @@ class HolodeckEnv(Env):
             Returns:
                 (EnvStep:named_tuple_array)        
         '''
-        sensor_dict, reward, terminal, _ = self._env.step(action)
+        reward = 0
+        for _ in range(4):  # TODO make this part of holodeck
+            sensor_dict, temp_reward, terminal, _ = self._env.step(action)  # * np.array([6.508, 5.087, .8, 59.844]))  # TODO get bounds programatically
+            reward += temp_reward
 
         if self.rollout_count % self.gif_freq == 0:
             self.gif_images.append(self.get_img(sensor_dict))
