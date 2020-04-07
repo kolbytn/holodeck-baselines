@@ -18,23 +18,31 @@ class PpoHolodeckModel(nn.Module):
         super().__init__()
 
         self.is_continuous = is_continuous
-        in_channel = img_size[0]
-        conv_out = int(img_size[1] * img_size[2])
-        linear_in = conv_out + lin_size
+        self.has_img = img_size is not None
+        self.has_lin = lin_size is not None
 
-        self._conv_layers = nn.Sequential(
-            nn.Conv2d(in_channel, 8, 3, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(8, 16, 2, stride=2),
-            nn.ReLU(),
-            nn.Conv2d(16, 16, 3, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(16, 32, 2, stride=2),
-            nn.ReLU(),
-            nn.Conv2d(32, 32, 3, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(32, 64, 2, stride=2),
-            nn.ReLU())
+        if self.has_img:
+            in_channel = img_size[0]
+            conv_out = int(img_size[1] * img_size[2])
+
+            self._conv_layers = nn.Sequential(
+                nn.Conv2d(in_channel, 8, 3, padding=1),
+                nn.ReLU(),
+                nn.Conv2d(8, 16, 2, stride=2),
+                nn.ReLU(),
+                nn.Conv2d(16, 16, 3, padding=1),
+                nn.ReLU(),
+                nn.Conv2d(16, 32, 2, stride=2),
+                nn.ReLU(),
+                nn.Conv2d(32, 32, 3, padding=1),
+                nn.ReLU(),
+                nn.Conv2d(32, 64, 2, stride=2),
+                nn.ReLU())
+        else:
+            self._conv_layers = None
+            conv_out = 0
+
+        linear_in = conv_out + (lin_size if self.has_lin else 0)
 
         self._linear_layers = nn.Sequential(
             nn.Linear(linear_in, hidden_size),
@@ -49,16 +57,31 @@ class PpoHolodeckModel(nn.Module):
         self._log_std = torch.nn.Parameter(torch.ones(action_size))
 
     def forward(self, state, prev_action, prev_reward):
-        img, lin = state
+        if self.has_img and self.has_lin:
+            img, lin = state
+        elif self.has_img:
+            img, lin = state, None
+        else:
+            img, lin = None, state
 
         # T and B are rlpyt's iterations per sampling period and num envs
-        lead_dim, T, B, _ = infer_leading_dims(img, 3)
-        img = img.view(T * B, img.shape[-3], img.shape[-2], img.shape[-1])
-        lin = lin.view(T * B, lin.shape[-1])
+        if self.has_lin:
+            lead_dim, T, B, _ = infer_leading_dims(lin, 1)
+            lin = lin.view(T * B, lin.shape[-1])
+        if self.has_img:
+            lead_dim, T, B, _ = infer_leading_dims(img, 3)
+            img = img.view(T * B, img.shape[-3], img.shape[-2], img.shape[-1])
 
-        img_rep = self._conv_layers(img)
-        img_flat = torch.flatten(img_rep, start_dim=1)
-        linear_inp = torch.cat((img_flat, lin), dim=-1)
+        if self.has_img:
+            img_rep = self._conv_layers(img)
+            img_flat = torch.flatten(img_rep, start_dim=1)
+            if self.has_lin:
+                linear_inp = torch.cat((img_flat, lin), dim=-1)
+            else:
+                linear_inp = img_flat
+        else:
+            linear_inp = lin
+        
         linear_out = self._linear_layers(linear_inp)
 
         pi, v = self._policy(linear_out), self._value(linear_out).squeeze(-1)

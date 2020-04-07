@@ -1,0 +1,56 @@
+{
+    "name": "MaxDistance",
+    "world": "InfiniteForest",
+    "package_name": "DefaultWorlds",
+    "main_agent": "uav0",
+    "agents":[
+        {
+            "agent_name": "uav0",
+            "agent_type": "UavAgent",
+            "sensors": [
+                {
+                    "sensor_type": "RGBCamera",
+                    "socket": "CameraSocket"
+                },
+                {
+                    "sensor_type": "LocationSensor"
+                },
+                {
+                    "sensor_type": "OrientationSensor"
+                },
+                {
+                    "sensor_type": "VelocitySensor"
+                },
+                {
+                    "sensor_type": "CollisionSensor"
+                },
+                {
+                    "sensor_type": "IMUSensor"
+                },
+                {
+                    "sensor_type": "AbuseSensor"
+                },
+		        {
+                    "sensor_type": "RangeFinderSensor",
+                    "configuration": {
+                        "LaserCount": 5
+                    }
+                },
+		        {
+                    "sensor_type": "DistanceTask",
+                    "configuration": {
+                        "Interval": 5,
+                        "GoalDistance": 1000,
+                        "MaximizeDistance": true 
+                    }
+                }
+            ],
+            "control_scheme": 0,
+            "location": [0.0, 0.0, 0.5],
+            "rotation": [0.0, 0.0, 0.0]
+        }
+    ],
+
+    "window_width":  1280,
+    "window_height": 720
+}
