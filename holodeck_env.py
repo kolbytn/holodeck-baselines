@@ -37,7 +37,7 @@ class HolodeckEnv(Env):
         else:
             self._action_space = IntBox(self._env.action_space.get_low(), 
                                         self._env.action_space.get_high(), 
-                                        self._env.action_space.shape)
+                                        ())
 
         # Calculate observation space with all sensor data
         max_width = 0
@@ -175,6 +175,9 @@ class HolodeckEnv(Env):
                 (nparray)
         '''
 
+        if self._env.num_agents > 1:  # Only include main agent observations
+            sensor_dict = sensor_dict[self._env._agent.name]  # TODO get main agent without accessing protected member
+
         img = self._get_img_null()
         lin = self._get_lin_null()
 
@@ -184,7 +187,7 @@ class HolodeckEnv(Env):
         curr_img = 0
         curr_lin = 0
         for name, value in sensor_dict.items():
-            if 'Task' in name:
+            if 'Task' in name:  # Do not include tasks in observation
                 continue
             if len(value.shape) == 3:
                 width = value.shape[0]
