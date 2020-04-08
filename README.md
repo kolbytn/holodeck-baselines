@@ -10,8 +10,8 @@ Clone repo and install requirements via pip
 
 ## Usage
 
-Run `main.py` to start training on a task.
+Run `main.py` to start training on a task. The `scenario` option takes either a scenario associated with a holodeck package you have already installed on your machine or a path to a scenario json file that specifies the `package_name`. In the latter case, the package will be installed automatically. Remember to set `cuda_idx` to an int (eg. 0) if you want to run your model using cuda.
 
-To see options run: 
+To see other options run: 
 
 ```python3 main.py --help```
