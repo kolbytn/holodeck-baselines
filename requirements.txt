@@ -2,7 +2,7 @@ absl-py==0.9.0
 holodeck==0.3.1
 imageio==2.6.1
 numpy==1.18.0
-Pillow==7.0.0
+Pillow==9.0.0
 pkg-resources==0.0.0
 posix-ipc==1.0.4
 psutil==5.6.7
