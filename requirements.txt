@@ -8,4 +8,4 @@ posix-ipc==1.0.4
 psutil==5.6.7
 PyPrind==2.11.2
 -e git://github.com/astooke/rlpyt@d797dd8835a91a7b2902563a097c83ed7c8d3e92#egg=rlpyt
-torch==1.2.0
+torch==1.13.1
